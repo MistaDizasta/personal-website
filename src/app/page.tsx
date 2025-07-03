@@ -101,19 +101,25 @@ export default function Home() {
   }, [allProjects, projectFilterTerm]);
 
   // Handler function for skill search input changes
-  const handleSkillSearchChange = (event) => {
+  const handleSkillSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSkillSearchTerm(event.target.value);
   };
 
   // Handler function for project filter input changes
-  const handleProjectFilterChange = (event) => {
+  const handleProjectFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setProjectFilterTerm(event.target.value);
   };
 
   // Helper function to group skills by category for display
-  const groupSkillsByCategory = (skills) => {
-    return skills.reduce((acc, skill) => {
-      (acc[skill.category] = acc[skill.category] || []).push(skill.name);
+  type Skill = { category: string; name: string };
+  type GroupedSkills = { [category: string]: string[] };
+
+  const groupSkillsByCategory = (skills: Skill[]): GroupedSkills => {
+    return skills.reduce((acc: GroupedSkills, skill: Skill) => {
+      if (!acc[skill.category]) {
+        acc[skill.category] = [];
+      }
+      acc[skill.category].push(skill.name);
       return acc;
     }, {});
   };
@@ -129,12 +135,12 @@ export default function Home() {
         <div className="container mx-auto">
           <div className="lg:w-2/3 xl:w-3/5">
             <div className="mb-5">
-              <h2 className="text-xl no-underline text-light text-white">Hello, I'm Dhiemas Darma</h2>
+              <h2 className="text-xl no-underline text-light text-white">Hello, I&apos;m Dhiemas Darma</h2>
               <h1 className="text-3xl md:text-4xl font-display text-shadow-black">Full-Stack Web Developer</h1>
             </div>
             <div className="mb-5 text-shadow-black space-y-2">
               <p>
-                Hi there! I'm Dhiemas Darma, a passionate web developer dedicated to building responsive, user-friendly, and high-performance websites. I specialize in front-end development with React, full-stack solutions with Node.js. Let's create something amazing together!
+                Hi there! I&apos;m Dhiemas Darma, a passionate web developer dedicated to building responsive, user-friendly, and high-performance websites. I specialize in front-end development with React, full-stack solutions with Node.js. Let&apos;s create something amazing together!
               </p>
             </div>
             <div>
@@ -167,10 +173,10 @@ export default function Home() {
 
                 {/* Display Filtered Skills */}
                 {Object.entries(groupedFilteredSkills).map(([category, skills]) => (
-                  <p key={category} className="text-white mb-2">
-                    <strong className="text-gray-400">{category}:</strong>{" "}
-                    <span className="text-white">{skills.join(", ")}</span>
-                  </p>
+                  <div key={category} className="mb-2">
+                    <span className="text-gray-400 font-semibold">{category}:</span>{" "}
+                    <span className="text-white">{Array.isArray(skills) ? skills.join(", ") : String(skills)}</span>
+                  </div>
                 ))}
 
                 {/* Message if no skills are found after filtering */}
@@ -206,8 +212,11 @@ export default function Home() {
                     src={project.imageUrl}
                     alt={project.title}
                     className="w-full h-48 object-cover"
-                    // Fallback for image loading errors
-                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/600x400/374151/ffffff?text=Image+Error"; }}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = "https://placehold.co/600x400/374151/ffffff?text=Image+Error";
+                    }}
                   />
                   <div className="p-6">
                     <h3 className="text-2xl font-semibold text-white mb-2">{project.title}</h3>
